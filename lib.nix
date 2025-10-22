@@ -171,6 +171,15 @@ let
                   Desktop files are patched by default to update Exec= and Icon= paths.
                 '';
               };
+              filesToExclude = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                default = [ ];
+                description = ''
+                  List of file paths (glob patterns) relative to package root to exclude from the wrapped package.
+                  This allows filtering out unwanted binaries or files.
+                  Example: [ "bin/unwanted-tool" "share/applications/*.desktop" ]
+                '';
+              };
             };
           }
         )
@@ -231,6 +240,7 @@ let
           args = config.args;
           env = config.env;
           filesToPatch = config.filesToPatch;
+          filesToExclude = config.filesToExclude;
           passthru = {
             inherit configuration settings;
           }
@@ -254,6 +264,7 @@ let
     - `passthru`: Attribute set to pass through to the wrapped derivation (optional)
     - `aliases`: List of additional names to symlink to the wrapped executable (optional)
     - `filesToPatch`: List of file paths (glob patterns) to patch for self-references (optional, defaults to ["share/applications/*.desktop"])
+    - `filesToExclude`: List of file paths (glob patterns) to exclude from the wrapped package (optional, defaults to [])
     - `wrapper`: Custom wrapper function (optional, defaults to exec'ing the original binary with args)
       - Called with { env, flags, args, envString, flagsString, exePath, preHook }
 
@@ -302,8 +313,10 @@ let
       preHook ? "",
       passthru ? { },
       aliases ? [ ],
+      # List of file paths (glob patterns) relative to package root to patch for self-references (e.g., ["bin/*", "lib/*.sh"])
       filesToPatch ? [ "share/applications/*.desktop" ],
-      # List of file paths relative to package root to patch for self-references (e.g., ["bin/*", "lib/*.sh"])
+      # List of file paths (glob patterns) to exclude from the wrapped package (e.g., ["bin/unwanted-*", "share/doc/*"])
+      filesToExclude ? [ ],
       wrapper ? (
         {
           exePath,
@@ -365,6 +378,7 @@ let
           aliases ? [ ],
           binName ? null,
           filesToPatch ? [ ],
+          filesToExclude ? [ ],
           ...
         }@args:
         pkgs.stdenv.mkDerivation (
@@ -379,6 +393,19 @@ let
               for path in ${lib.concatStringsSep " " (map toString paths)}; do
                 ${pkgs.lndir}/bin/lndir -silent "$path" $out
               done
+
+              # Exclude specified files
+              ${lib.optionalString (filesToExclude != [ ]) ''
+                echo "Excluding specified files..."
+                ${lib.concatMapStringsSep "\n" (pattern: ''
+                  for file in $out/${pattern}; do
+                    if [[ -e "$file" ]]; then
+                      echo "Removing $file"
+                      rm -f "$file"
+                    fi
+                  done
+                '') filesToExclude}
+              ''}
 
               # Patch specified files to replace references to the original package with the wrapped one
               ${lib.optionalString (filesToPatch != [ ]) ''
@@ -444,6 +471,7 @@ let
             "aliases"
             "binName"
             "filesToPatch"
+            "filesToExclude"
           ])
         );
 
@@ -477,6 +505,7 @@ let
             aliases
             binName
             filesToPatch
+            filesToExclude
             ;
           passthru =
             (package.passthru or { })
