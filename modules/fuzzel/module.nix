@@ -21,7 +21,7 @@ wlib.wrapModule (
       extraFlags = lib.mkOption {
         type = lib.types.attrsOf lib.types.unspecified; # TODO add list handling
         default = { };
-        description = "Extra flags to pass to mpv.";
+        description = "Extra flags to pass to fuzzel.";
       };
     };
     config.flagSeparator = "=";
