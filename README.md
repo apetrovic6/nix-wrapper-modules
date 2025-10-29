@@ -72,7 +72,7 @@ wrappers.lib.wrapPackage {
 ```nix
 { wlib, lib }:
 
-wlib.wrapModule (wlib: { config, ... }: {
+wlib.wrapModule ({ config, wlib, ... }: {
   options = {
     profile = lib.mkOption {
       type = lib.types.enum [ "fast" "quality" ];
@@ -85,7 +85,7 @@ wlib.wrapModule (wlib: { config, ... }: {
       description = "Directory for output files";
     };
   };
-  
+
   config.package = config.pkgs.ffmpeg;
   config.flags = {
     "-preset" = if config.profile == "fast" then "veryfast" else "slow";
