@@ -204,6 +204,34 @@ let
                   // config.passthru;
                 };
               };
+              _moduleSettings = lib.mkOption {
+                type = lib.types.raw;
+                internal = true;
+                readOnly = true;
+                description = ''
+                  Internal option storing the settings module passed to apply.
+                  Used by extend to re-evaluate with additional modules.
+                '';
+              };
+              extend = lib.mkOption {
+                type = lib.types.functionTo lib.types.raw;
+                readOnly = true;
+                description = ''
+                  Function to extend the current configuration with additional modules.
+                  Re-evaluates the configuration with the original settings plus the new module.
+                '';
+                default =
+                  module:
+                  let
+                    configuration = eval {
+                      imports = [
+                        config._moduleSettings
+                        module
+                      ];
+                    };
+                  in
+                  configuration.config.result.config;
+              };
             };
           }
         )
@@ -237,6 +265,7 @@ let
                     imports = staticModules ++ [
                       config.interface
                       config.settings
+                      { _moduleSettings = config.settings; }
                     ];
                   };
                 };

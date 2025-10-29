@@ -147,6 +147,7 @@ Built-in options (always available):
 - `filesToPatch`: List of file paths (glob patterns) to patch for self-references (default: `["share/applications/*.desktop"]`)
 - `filesToExclude`: List of file paths (glob patterns) to exclude from the wrapped package (default: `[]`)
 - `wrapper`: The resulting wrapped package (read-only, auto-generated from other options)
+- `extend`: Function to extend the configuration with additional modules (read-only)
 
 Custom types:
 - `wlib.types.file`: File type with `content` and `path` options
@@ -160,6 +161,34 @@ The wrapper module system integrates with NixOS module evaluation:
 - Supports all standard module features (imports, conditionals, mkIf, etc.)
 - Provides `config` for accessing evaluated configuration
 - Provides `options` for introspection and documentation
+
+### Extending Configurations
+
+The `extend` function allows you to extend an already-applied configuration with additional modules, similar to `extendModules` in NixOS:
+
+```nix
+# Apply initial configuration
+initialConfig = wrappers.wrapperModules.mpv.apply {
+  pkgs = pkgs;
+  scripts = [ pkgs.mpvScripts.mpris ];
+  "mpv.conf".content = ''
+    vo=gpu
+  '';
+};
+
+# Extend with additional configuration
+extendedConfig = initialConfig.extend {
+  scripts = [ pkgs.mpvScripts.thumbnail ];
+  "mpv.conf".content = ''
+    profile=gpu-hq
+  '';
+};
+
+# Access the wrapper
+package = extendedConfig.wrapper;
+```
+
+The `extend` function re-evaluates the module with both the original settings and the new module, allowing you to override or add to the existing configuration.
 
 ## Example Modules
 
