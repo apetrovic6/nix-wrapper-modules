@@ -24,7 +24,7 @@ let
           module
           {
             inherit pkgs;
-            package = lib.mkOrder 0 pkgs.hello;
+            package = lib.mkOverride 9001 pkgs.hello;
           }
         ];
       };
@@ -41,7 +41,7 @@ let
                 );
                 imports = [ mod ];
                 config.pkgs = pkgs;
-                config.package = lib.mkOrder 0 package;
+                config.package = lib.mkOverride 9001 package;
               }
             ];
           }).options
@@ -78,7 +78,7 @@ let
               builtins.removeAttrs
                 (wlib.evalModule {
                   inherit pkgs;
-                  package = lib.mkOrder 0 pkgs.hello;
+                  package = lib.mkOverride 9001 pkgs.hello;
                 }).options
                 [ "_module" ];
           };
