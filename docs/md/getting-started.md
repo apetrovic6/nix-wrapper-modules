@@ -38,6 +38,7 @@ They will get you started with a module file and the default one also gives you 
 ```nix
 {
   inputs.wrappers.url = "github:BirdeeHub/nix-wrapper-modules";
+  inputs.wrappers.inputs.nixpkgs.follows = "nixpkgs";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
   outputs = { self, nixpkgs, wrappers }: let
     forAllSystems = with nixpkgs.lib; genAttrs platforms.all;

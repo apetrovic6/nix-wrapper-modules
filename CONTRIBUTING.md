@@ -158,6 +158,8 @@ For new additions, the description should be `init`, with any further explanatio
 
 For `lib` additions and changes, the description should be `type(lib.<set>.<name>): some description` or `type(lib.<name>): some description`.
 
+For template additions and changes, the description should be `type(templates.<name>): some description`.
+
 Changes to the core options set defined in `lib/core.nix` should be titled `type(core): some description`.
 
 `type` refers to a one word tag [like `feat`, `fix`, `docs`, or `test`](https://gist.github.com/Zekfad/f51cb06ac76e2457f11c80ed705c95a3#commit-types) as specified by [Conventional Commits](https://www.conventionalcommits.org)
