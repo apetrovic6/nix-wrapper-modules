@@ -6,17 +6,13 @@
     let
       fpkgs =
         system:
-        if inputs.pkgs.lib or null != null then
+        if inputs.pkgs.stdenv.hostPlatform.system or null == system then
           inputs.pkgs
         else if inputs.nixpkgs.legacyPackages.${system} or null != null then
           inputs.nixpkgs.legacyPackages.${system}
-        else if inputs ? nixpkgs then
-          import inputs.nixpkgs { inherit system; }
         else
-          import <nixpkgs> { inherit system; };
-      lib =
-        inputs.pkgs.lib or inputs.nixpkgs.lib
-          or (if inputs ? nixpkgs then import "${inputs.nixpkgs}/lib" else import <nixpkgs/lib>);
+          import (inputs.pkgs.path or inputs.nixpkgs or <nixpkgs>) { inherit system; };
+      lib = inputs.pkgs.lib or inputs.nixpkgs.lib or (import "${inputs.nixpkgs or <nixpkgs>}/lib");
       forAllSystems = lib.genAttrs lib.platforms.all;
     in
     {
