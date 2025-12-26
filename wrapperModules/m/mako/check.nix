@@ -4,7 +4,7 @@
 }:
 
 let
-  mpvWrapped =
+  makoWrapped =
     (self.wrapperModules.mako.apply {
       inherit pkgs;
       "--config".content = ''
@@ -15,11 +15,11 @@ let
 
 in
 if builtins.elem pkgs.stdenv.hostPlatform.system self.wrapperModules.mako.meta.platforms then
-  pkgs.runCommand "mpv-test" { } ''
-    "${mpvWrapped}/bin/mako" --help | grep -q "mako"
+  pkgs.runCommand "mako-test" { } ''
+    "${makoWrapped}/bin/mako" --help | grep -q "mako"
     touch $out
   ''
 else
-  pkgs.runCommand "mpv-test-disabled" { } ''
+  pkgs.runCommand "mako-test-disabled" { } ''
     touch $out
   ''
