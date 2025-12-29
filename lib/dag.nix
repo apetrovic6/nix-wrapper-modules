@@ -183,12 +183,10 @@ let
             { loc, defs }:
             submoduleType.merge.v2 {
               inherit loc;
-              defs = (
-                map (def: {
-                  inherit (def) file;
-                  value = maybeConvert def;
-                }) defs
-              );
+              defs = map (def: {
+                inherit (def) file;
+                value = maybeConvert def;
+              }) defs;
             };
         };
       };
