@@ -137,11 +137,14 @@ let
     ++ lib.optional (config.prefixVar != [ ] || config.prefixContent != [ ]) prefixvarfunc
     ++ lib.optional (config.suffixVar != [ ] || config.suffixContent != [ ]) suffixvarfunc;
 in
-''
-  mkdir -p $out/bin
-  echo ${lib.escapeShellArg "#!${bash}/bin/bash"} > $out/bin/${config.binName}
-  ${wrapcmd (builtins.concatStringsSep "\n" prefuncs)}
-  ${builtins.concatStringsSep "\n" shellcmds}
-  ${lib.optionalString (!lib.isFunction config.argv0type) (wrapcmd "exec -a ${arg0} ${finalcmd}")}
-  chmod +x $out/bin/${config.binName}
-''
+if config.binName == "" then
+  ""
+else
+  ''
+    mkdir -p $out/bin
+    echo ${lib.escapeShellArg "#!${bash}/bin/bash"} > $out/bin/${config.binName}
+    ${wrapcmd (builtins.concatStringsSep "\n" prefuncs)}
+    ${builtins.concatStringsSep "\n" shellcmds}
+    ${lib.optionalString (!lib.isFunction config.argv0type) (wrapcmd "exec -a ${arg0} ${finalcmd}")}
+    chmod +x $out/bin/${config.binName}
+  ''
