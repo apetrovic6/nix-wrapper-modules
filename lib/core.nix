@@ -478,9 +478,9 @@ in
             __functor = {
               mkDerivation,
               __functor,
-              defaultPhases # [ "<all stdenv phases>" ... ]
-              setupPhases # phases: "if [ -z \"''${phases[*]:-}\" ]; then phases="etc..."; fi"
-              runPhases # "for curPhase in ''${phases[*]}; do runPhase \"$curPhase\"; done"
+              defaultPhases, # [ "<all stdenv phases>" ... ]
+              setupPhases, # phases: "if [ -z \"''${phases[*]:-}\" ]; then phases="etc..."; fi"
+              runPhases, # "for curPhase in ''${phases[*]}; do runPhase \"$curPhase\"; done"
             }@self:
             defaultArgs:
             defaultArgs // (if config.sourceStdenv then { } else { buildCommand = ""; }
